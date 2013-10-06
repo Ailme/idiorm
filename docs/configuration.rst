@@ -65,6 +65,16 @@ once.
         'etc' => 'etc'
     ));
 
+Use the ``get_config`` method to read current settings.
+
+.. code-block:: php
+
+    <?php
+    $isLoggingEnabled = ORM::get_config('logging');
+    ORM::configure('logging', false);
+    // some crazy loop we don't want to log
+    ORM::configure('logging', $isLoggingEnabled);
+
 Database authentication details
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -202,6 +212,22 @@ the table, you can use the following configuration:
         'role' => 'role_id',
     ));
 
+Limit clause style
+^^^^^^^^^^^^^^^^^^
+
+Setting: ``limit_clause_style``
+
+You can specify the limit clause style in the configuration. This is to facilitate
+a MS SQL style limit clause that uses the ``TOP`` syntax.
+
+Acceptable values are ``ORM::LIMIT_STYLE_TOP_N`` and ``ORM::LIMIT_STYLE_LIMIT``.
+
+.. note::
+
+    If the PDO driver you are using is one of sqlsrv, dblib or mssql then Idiorm
+    will automatically select the ``ORM::LIMIT_STYLE_TOP_N`` for you unless you
+    override the setting.
+
 Query logging
 ^^^^^^^^^^^^^
 
@@ -214,6 +240,30 @@ When query logging is enabled, you can use two static methods to access
 the log. ``ORM::get_last_query()`` returns the most recent query
 executed. ``ORM::get_query_log()`` returns an array of all queries
 executed.
+
+Query logger
+^^^^^^^^^^^^
+
+Setting: ``logger``
+
+.. note::
+
+    You must enable ``logging`` for this setting to have any effect.
+
+It is possible to supply a ``callable`` to this configuration setting, which will
+be executed for every query that idiorm executes. In PHP a ``callable`` is anything
+that can be executed as if it were a function. Most commonly this will take the
+form of a anonymous function.
+
+This setting is useful if you wish to log queries with an external library as it
+allows you too whatever you would like from inside the callback function.
+
+.. code-block:: php
+
+    <?php
+    ORM::configure('logger', function($log_string) {
+        echo $log_string;
+    });
 
 Query caching
 ^^^^^^^^^^^^^
